@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Text, View } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import CatalogoScreen  from './src/screens/CatalogoScreen'
 import DetalleScreen   from './src/screens/DetalleScreen'
@@ -17,26 +18,32 @@ const Stack = createNativeStackNavigator()
 const ACCENT = '#155124'
 const MUTED  = '#8C959F'
 
+const HEADER_OPTS = {
+  headerStyle:      { backgroundColor: '#fff' },
+  headerTintColor:  ACCENT,
+  headerTitleStyle: { fontWeight: '800' },
+}
+
 function TabIcon ({ label, focused }) {
   const icons = { 'Catálogo': '🗂', Pedido: '🛒', Historial: '📋', Config: '⚙️' }
   return (
-    <View style={{ alignItems: 'center' }}>
-      <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.5 }}>{icons[label] || '•'}</Text>
-    </View>
+    <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.5 }}>
+      {icons[label] || '•'}
+    </Text>
   )
 }
 
+// ── Stack del Catálogo ────────────────────────────────────
 function CatalogoStack ({ carrito }) {
   return (
-    <Stack.Navigator screenOptions={{
-      headerStyle: { backgroundColor: '#fff' },
-      headerTintColor: ACCENT,
-      headerTitleStyle: { fontWeight: '800' },
-    }}>
+    <Stack.Navigator screenOptions={HEADER_OPTS}>
       <Stack.Screen name="Catalogo" options={{ title: 'Catálogo' }}>
         {props => <CatalogoScreen {...props} carrito={carrito} />}
       </Stack.Screen>
-      <Stack.Screen name="Detalle" options={({ route }) => ({ title: route.params?.modelo?.codigo || 'Detalle' })}>
+      <Stack.Screen
+        name="Detalle"
+        options={({ route }) => ({ title: route.params?.modelo?.codigo || 'Detalle' })}
+      >
         {props => <DetalleScreen {...props} carrito={carrito} />}
       </Stack.Screen>
       <Stack.Screen name="Pedido" options={{ title: 'Mi pedido' }}>
@@ -46,34 +53,72 @@ function CatalogoStack ({ carrito }) {
   )
 }
 
+// ── Stack de Pedido (tab directa) ────────────────────────
+function PedidoStack ({ carrito }) {
+  return (
+    <Stack.Navigator screenOptions={HEADER_OPTS}>
+      <Stack.Screen name="PedidoMain" options={{ title: 'Mi pedido' }}>
+        {props => <PedidoScreen {...props} carrito={carrito} />}
+      </Stack.Screen>
+    </Stack.Navigator>
+  )
+}
+
+// ── Stack de Historial ───────────────────────────────────
+function HistorialStack () {
+  return (
+    <Stack.Navigator screenOptions={HEADER_OPTS}>
+      <Stack.Screen name="HistorialMain" options={{ title: 'Historial' }}
+        component={HistorialScreen} />
+    </Stack.Navigator>
+  )
+}
+
+// ── Stack de Config ──────────────────────────────────────
+function ConfigStack () {
+  return (
+    <Stack.Navigator screenOptions={HEADER_OPTS}>
+      <Stack.Screen name="ConfigMain" options={{ title: 'Configuración' }}
+        component={ConfigScreen} />
+    </Stack.Navigator>
+  )
+}
+
 export default function App () {
   const carrito = useCarrito()
+
   return (
-    <NavigationContainer>
-      <StatusBar style="dark" />
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          headerShown: false,
-          tabBarActiveTintColor: ACCENT,
-          tabBarInactiveTintColor: MUTED,
-          tabBarStyle: { borderTopColor: '#D0D7DE', backgroundColor: '#fff', height: 60, paddingBottom: 8 },
-          tabBarLabelStyle: { fontSize: 11, fontWeight: '700' },
-          tabBarIcon: ({ focused }) => <TabIcon label={route.name} focused={focused} />,
-        })}
-      >
-        <Tab.Screen name="Catálogo" options={{ tabBarBadge: carrito.total > 0 ? carrito.total : undefined }}>
-          {() => <CatalogoStack carrito={carrito} />}
-        </Tab.Screen>
-        <Tab.Screen name="Pedido">
-          {props => <PedidoScreen {...props} carrito={carrito} />}
-        </Tab.Screen>
-        <Tab.Screen name="Historial" component={HistorialScreen} />
-        <Tab.Screen name="Config" component={ConfigScreen} options={{
-          headerShown: true, headerTitle: 'Configuración',
-          headerStyle: { backgroundColor: '#fff' },
-          headerTintColor: ACCENT, headerTitleStyle: { fontWeight: '800' },
-        }} />
-      </Tab.Navigator>
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <StatusBar style="dark" />
+        <Tab.Navigator
+          screenOptions={({ route }) => ({
+            headerShown:           false,
+            tabBarActiveTintColor:   ACCENT,
+            tabBarInactiveTintColor: MUTED,
+            tabBarStyle: {
+              borderTopColor:  '#D0D7DE',
+              backgroundColor: '#fff',
+            },
+            tabBarLabelStyle: { fontSize: 11, fontWeight: '700' },
+            tabBarIcon: ({ focused }) => <TabIcon label={route.name} focused={focused} />,
+          })}
+        >
+          <Tab.Screen
+            name="Catálogo"
+            options={{ tabBarBadge: carrito.total > 0 ? carrito.total : undefined }}
+          >
+            {() => <CatalogoStack carrito={carrito} />}
+          </Tab.Screen>
+
+          <Tab.Screen name="Pedido">
+            {() => <PedidoStack carrito={carrito} />}
+          </Tab.Screen>
+
+          <Tab.Screen name="Historial" component={HistorialStack} />
+          <Tab.Screen name="Config"    component={ConfigStack} />
+        </Tab.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
   )
 }
