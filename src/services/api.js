@@ -22,11 +22,17 @@ async function request (path, options = {}) {
 }
 
 export const api = {
-  ping:         ()           => request('/api/ping'),
-  catalogo:     ()           => request('/api/catalogo'),
-  colores:      ()           => request('/api/colores'),
-  fotoUrl:      (codigo)     => getBaseUrl().then(b => `${b}/api/foto/${encodeURIComponent(codigo)}`),
-  pedidos:      ()           => request('/api/pedidos'),
-  enviarPedido: (pedido)     => request('/api/pedidos', { method: 'POST', body: JSON.stringify(pedido) }),
-  setEstado:    (id, estado) => request(`/api/pedidos/${id}/estado`, { method: 'PUT', body: JSON.stringify({ estado }) }),
+  ping:            ()           => request('/api/ping'),
+  catalogo:        ()           => request('/api/catalogo'),
+  colores:         ()           => request('/api/colores'),
+  fotoUrl:         (codigo)     => getBaseUrl().then(b => `${b}/api/foto/${encodeURIComponent(codigo)}`),
+  pedidos:         ()           => request('/api/pedidos'),
+  enviarPedido:    (pedido)     => request('/api/pedidos', { method: 'POST', body: JSON.stringify(pedido) }),
+  setEstado:       (id, estado) => request(`/api/pedidos/${id}/estado`, { method: 'PUT', body: JSON.stringify({ estado }) }),
+  // Ventas
+  inventario:      ()           => request('/api/inventario'),
+  precioVenta:     ()           => request('/api/precio-venta'),
+  enviarVenta:     (venta)      => request('/api/ventas', { method: 'POST', body: JSON.stringify(venta) }),
+  // Config del servidor (para datos del ticket)
+  configServidor:  ()           => request('/api/config'),
 }

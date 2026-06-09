@@ -11,6 +11,7 @@ import DetalleScreen   from './src/screens/DetalleScreen'
 import PedidoScreen    from './src/screens/PedidoScreen'
 import HistorialScreen from './src/screens/HistorialScreen'
 import ConfigScreen    from './src/screens/ConfigScreen'
+import VentasScreen    from './src/screens/VentasScreen'
 import { useCarrito }  from './src/hooks/useCarrito'
 
 const Tab   = createBottomTabNavigator()
@@ -25,7 +26,7 @@ const HEADER_OPTS = {
 }
 
 function TabIcon ({ label, focused }) {
-  const icons = { 'Catálogo': '🗂', Pedido: '🛒', Historial: '📋', Config: '⚙️' }
+  const icons = { 'Catálogo': '🗂', Pedido: '🛒', Ventas: '🧾', Historial: '📋', Config: '⚙️' }
   return (
     <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.5 }}>
       {icons[label] || '•'}
@@ -60,6 +61,16 @@ function PedidoStack ({ carrito }) {
       <Stack.Screen name="PedidoMain" options={{ title: 'Mi pedido' }}>
         {props => <PedidoScreen {...props} carrito={carrito} />}
       </Stack.Screen>
+    </Stack.Navigator>
+  )
+}
+
+// ── Stack de Ventas ──────────────────────────────────────
+function VentasStack () {
+  return (
+    <Stack.Navigator screenOptions={HEADER_OPTS}>
+      <Stack.Screen name="VentasMain" options={{ title: 'Ventas' }}
+        component={VentasScreen} />
     </Stack.Navigator>
   )
 }
@@ -114,6 +125,8 @@ export default function App () {
           <Tab.Screen name="Pedido">
             {() => <PedidoStack carrito={carrito} />}
           </Tab.Screen>
+
+          <Tab.Screen name="Ventas" component={VentasStack} />
 
           <Tab.Screen name="Historial" component={HistorialStack} />
           <Tab.Screen name="Config"    component={ConfigStack} />
