@@ -53,25 +53,43 @@ Escanea QR con Expo Go desde el celular.
 - ✅ Pantalla Ventas con ticket completo
 - ✅ IVA automático según RFC del servidor
 - ✅ Descuento % por ticket
-- ⏳ APK pendiente de compilar con EAS Build
+- ✅ APK compilado con Android Studio y funcionando
 
-## Pendiente para próxima sesión — Generar APK
-1. El usuario tiene cuenta en **expo.dev**
-2. Necesita ejecutar: `eas build:configure` en la carpeta del proyecto
-3. Usar icono de monsam-app (monsam1.png o monsam2.png del repo) como icono del APK
-4. Crear `eas.json` con perfil `preview` para APK de prueba
-5. Ejecutar: `eas build -p android --profile preview`
-6. Descargar APK del link que da Expo y instalar en celular
+## Compilar APK con Android Studio
 
-## Pasos para el APK (próxima sesión)
-```bash
-cd "F:\DISEÑOS\Modelos 3D\control\monsam-mobile"
-npm install -g eas-cli
-eas login          # cuenta: fdtn91 en expo.dev
-eas build:configure
-eas build -p android --profile preview
+### Carpeta de compilación
+El proyecto se compila desde `D:\aplicaciones\monsam-mobile` (sin caracteres especiales en la ruta).
+El repo git sigue en `F:\DISEÑOS\Modelos 3D\control\monsam-mobile`.
+
+### Pasos para recompilar
+```powershell
+# 1. Copiar cambios JS al folder de compilación
+copy "F:\DISEÑOS\Modelos 3D\control\monsam-mobile\src\services\api.js" "D:\aplicaciones\monsam-mobile\src\services\api.js"
+# (repetir para cada archivo JS modificado)
+
+# 2. Si se modificó app.json, regenerar proyecto nativo:
+cd D:\aplicaciones\monsam-mobile
+npx expo prebuild --platform android --clean
+# ⚠️ Después del prebuild verificar que AndroidManifest.xml tenga:
+# android:usesCleartextTraffic="true" en el tag <application>
 ```
+
+### Generar APK firmado
+1. Abrir `D:\aplicaciones\monsam-mobile\android` en Android Studio
+2. **Build → Generate Signed Bundle / APK...**
+3. Seleccionar **APK**
+4. Usar keystore existente en `D:\aplicaciones\monsam-mobile\android\monsam.jks`
+5. Seleccionar **release**
+6. APK generado en: `android/app/release/app-release.apk`
+
+### ⚠️ Problemas conocidos y soluciones
+- **Ruta con Ñ**: Gradle/CMake no soporta caracteres no-ASCII. Por eso se compila desde `D:\aplicaciones\`
+- **usesCleartextTraffic**: DEBE estar en `AndroidManifest.xml` o la app no conecta al servidor HTTP
+- **newArchEnabled**: debe ser `false` en `gradle.properties`
+- **NDK**: usar versión 27.1.12297006 (la que el plugin de Expo fuerza)
+- **gradle.properties** debe tener: `android.overridePathCheck=true`
 
 ## Ramas Git
 - Rama local: `main` ✅
 - Remote: `fdtn91/monsam-mobile` en GitHub ✅
+- Carpeta de compilación: `D:\aplicaciones\monsam-mobile` (sin git, solo para Android Studio)
