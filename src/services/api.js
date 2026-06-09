@@ -13,12 +13,19 @@ export async function saveBaseUrl (url) {
 
 async function request (path, options = {}) {
   const base = await getBaseUrl()
-  const res  = await fetch(`${base}${path}`, {
-    ...options,
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }
-  })
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  return res.json()
+  const fullUrl = `${base}${path}`
+  console.log('[API] request:', fullUrl)
+  try {
+    const res = await fetch(fullUrl, {
+      ...options,
+      headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }
+    })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return res.json()
+  } catch (err) {
+    console.log('[API] error:', err.message, 'url:', fullUrl)
+    throw err
+  }
 }
 
 export const api = {
