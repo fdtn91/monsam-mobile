@@ -166,15 +166,23 @@ export default function VentasScreen () {
   const onBarcodeScan = ({ data }) => {
     if (scannedRef.current) return
     scannedRef.current = true
-    setShowScanner(false)
     const item = inventario.find(i => i.sku.toLowerCase() === data.toLowerCase())
     if (item) {
+      // Agregar silenciosamente sin notificación
       agregarItem(item)
-      Alert.alert('✅ Escaneado', `${item.sku}\n${item.modelo} · ${item.color}`, [{ text: 'OK' }])
+      // Permitir escanear el siguiente código tras un breve delay
+      setTimeout(() => { scannedRef.current = false }, 1500)
     } else {
-      Alert.alert('❌ No encontrado', `El código "${data}" no está en el inventario.`,
-        [{ text: 'Escanear otro', onPress: () => { scannedRef.current = false; setShowScanner(true) } },
-         { text: 'Cancelar' }])
+      // Solo mostrar alerta cuando el código NO está en el inventario
+      setShowScanner(false)
+      Alert.alert(
+        '❌ No encontrado',
+        `El código "${data}" no está en el inventario.`,
+        [
+          { text: 'Escanear otro', onPress: () => { scannedRef.current = false; setShowScanner(true) } },
+          { text: 'Cancelar' }
+        ]
+      )
     }
   }
 
@@ -296,15 +304,20 @@ export default function VentasScreen () {
         }
 
         {/* Modal del ticket */}
-        <Modal visible={showTicket} animationType="slide" presentationStyle="pageSheet">
+        <Modal visible={showTicket} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowTicket(false)}>
           <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
             <View style={{ flex: 1, backgroundColor: C.bg }}>
               {/* Header */}
               <View style={s.ticketHeader}>
                 <Text style={{ fontSize: 17, fontWeight: '800', color: C.text }}>Ticket de venta</Text>
-                <TouchableOpacity onPress={() => setShowTicket(false)}>
-                  <Text style={{ color: C.accent, fontWeight: '700', fontSize: 14 }}>Cerrar</Text>
-                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+                  <TouchableOpacity onPress={abrirScanner} style={{ padding: 4 }}>
+                    <Text style={{ fontSize: 22 }}>📷</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setShowTicket(false)}>
+                    <Text style={{ color: C.accent, fontWeight: '700', fontSize: 14 }}>Cerrar</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
 
               <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>

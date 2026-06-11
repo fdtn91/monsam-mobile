@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { Text, View } from 'react-native'
+import { Text, View, Image, StyleSheet } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
+import * as SplashScreen from 'expo-splash-screen'
 
 import CatalogoScreen  from './src/screens/CatalogoScreen'
 import DetalleScreen   from './src/screens/DetalleScreen'
@@ -13,6 +14,9 @@ import HistorialScreen from './src/screens/HistorialScreen'
 import ConfigScreen    from './src/screens/ConfigScreen'
 import VentasScreen    from './src/screens/VentasScreen'
 import { useCarrito }  from './src/hooks/useCarrito'
+
+// Mantener el splash nativo visible hasta que React Native esté listo
+SplashScreen.preventAutoHideAsync()
 
 const Tab   = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -96,7 +100,27 @@ function ConfigStack () {
 }
 
 export default function App () {
-  const carrito = useCarrito()
+  const carrito   = useCarrito()
+  const [appReady, setAppReady] = useState(false)
+
+  useEffect(() => {
+    // Ocultar el splash nativo (que en Android 12+ es pequeño/centrado)
+    // y reemplazarlo con nuestra vista personalizada a pantalla completa
+    SplashScreen.hideAsync().then(() => setAppReady(true))
+  }, [])
+
+  // ── Splash personalizado a pantalla completa ──────────────
+  if (!appReady) {
+    return (
+      <View style={styles.splash}>
+        <Image
+          source={require('./assets/splash.png')}
+          style={StyleSheet.absoluteFill}
+          resizeMode="cover"
+        />
+      </View>
+    )
+  }
 
   return (
     <SafeAreaProvider>
@@ -104,7 +128,7 @@ export default function App () {
         <StatusBar style="dark" />
         <Tab.Navigator
           screenOptions={({ route }) => ({
-            headerShown:           false,
+            headerShown:             false,
             tabBarActiveTintColor:   ACCENT,
             tabBarInactiveTintColor: MUTED,
             tabBarStyle: {
@@ -135,3 +159,7 @@ export default function App () {
     </SafeAreaProvider>
   )
 }
+
+const styles = StyleSheet.create({
+  splash: { flex: 1, backgroundColor: '#155124' },
+})
