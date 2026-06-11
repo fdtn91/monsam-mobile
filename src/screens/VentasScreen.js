@@ -95,7 +95,11 @@ export default function VentasScreen () {
     )
   }
 
-  const quitarItem = (sku) => setTicketItems(prev => prev.filter(i => i.sku !== sku))
+  const quitarItem = (sku) => setTicketItems(prev => {
+    const next = prev.filter(i => i.sku !== sku)
+    if (next.length === 0) setShowTicket(false) // cerrar modal si queda vacío
+    return next
+  })
 
   const limpiarTicket = () => {
     setTicketItems([])
