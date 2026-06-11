@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { api } from '../services/api'
+import ColorSwatch from '../components/ColorSwatch'
 
 const C = { accent:'#155124', bg:'#F0F2F5', card:'#FFFFFF', border:'#D0D7DE', text:'#1F2328', text2:'#57606A', muted:'#8C959F', ok:'#1A7F37' }
 
@@ -35,7 +36,7 @@ export default function DetalleScreen ({ carrito }) {
           <FlatList horizontal data={colores} keyExtractor={c => String(c.id)} showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap:10, paddingBottom:4 }}
             renderItem={({ item: c }) => (
               <TouchableOpacity style={[s.colorChip, colorSel?.id===c.id && s.colorChipSel]} onPress={() => setColorSel(c)}>
-                <View style={[s.swatch, { backgroundColor: c.hex||'#888' }]} />
+                <ColorSwatch hex={c.hex} hex2={c.hex2} hex3={c.hex3} size={28} style={{ borderWidth:1, borderColor:'#D0D7DE' }} />
                 <Text style={[{ fontSize:10, color:C.text2, textAlign:'center' }, colorSel?.id===c.id && { color:C.accent }]} numberOfLines={2}>{c.nombre}</Text>
                 <Text style={{ fontSize:9, color:C.muted }}>{c.stockGr}gr</Text>
               </TouchableOpacity>

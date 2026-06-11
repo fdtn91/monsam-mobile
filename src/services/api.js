@@ -11,6 +11,14 @@ export async function saveBaseUrl (url) {
   await AsyncStorage.setItem('serverUrl', url.trim().replace(/\/$/, ''))
 }
 
+// Helper para parsear colores degradados
+function parsearColores (colores) {
+  return colores.map(c => {
+    const parts = (c.hex || '#888888').split('|')
+    return { ...c, hex: parts[0], hex2: parts[1] || null, hex3: parts[2] || null }
+  })
+}
+
 async function request (path, options = {}) {
   const base = await getBaseUrl()
   const fullUrl = `${base}${path}`
@@ -31,7 +39,7 @@ async function request (path, options = {}) {
 export const api = {
   ping:            ()           => request('/api/ping'),
   catalogo:        ()           => request('/api/catalogo'),
-  colores:         ()           => request('/api/colores'),
+  colores:         ()           => request('/api/colores').then(parsearColores),
   fotoUrl:         (codigo)     => getBaseUrl().then(b => `${b}/api/foto/${encodeURIComponent(codigo)}`),
   pedidos:         ()           => request('/api/pedidos'),
   enviarPedido:    (pedido)     => request('/api/pedidos', { method: 'POST', body: JSON.stringify(pedido) }),

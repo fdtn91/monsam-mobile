@@ -12,7 +12,7 @@ export function useCarrito () {
         next[idx] = { ...next[idx], pares: next[idx].pares + 1 }
         return next
       }
-      return [...prev, { key, codigo: modelo.codigo, carpeta: modelo.carpeta, color: color.nombre, color_hex: color.hex, pares: 1 }]
+      return [...prev, { key, codigo: modelo.codigo, carpeta: modelo.carpeta, color: color.nombre, color_hex: color.hex, color_hex2: color.hex2 || null, color_hex3: color.hex3 || null, pares: 1 }]
     })
   }, [])
 

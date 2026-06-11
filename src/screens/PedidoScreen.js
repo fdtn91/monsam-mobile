@@ -3,6 +3,7 @@ import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, Alert, A
 import { useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { api } from '../services/api'
+import ColorSwatch from '../components/ColorSwatch'
 
 const C = { accent:'#155124', bg:'#F0F2F5', card:'#FFFFFF', border:'#D0D7DE', text:'#1F2328', text2:'#57606A', muted:'#8C959F', error:'#CF222E' }
 
@@ -52,7 +53,7 @@ export default function PedidoScreen ({ carrito }) {
           ListHeaderComponent={<Text style={{ fontSize:13, fontWeight:'700', color:C.text2, marginBottom:12, textTransform:'uppercase', letterSpacing:0.5 }}>{carrito.items.reduce((s,i)=>s+i.pares,0)} pares en el pedido</Text>}
           renderItem={({ item }) => (
             <View style={s.itemCard}>
-              <View style={[s.swatch, { backgroundColor: item.color_hex||'#888' }]} />
+              <ColorSwatch hex={item.color_hex} hex2={item.color_hex2} hex3={item.color_hex3} size={20} style={{ borderWidth:1, borderColor:'#D0D7DE' }} />
               <View style={{ flex:1 }}>
                 <Text style={s.itemCode}>{item.codigo}</Text>
                 <Text style={s.itemColor} numberOfLines={1}>{item.color}</Text>

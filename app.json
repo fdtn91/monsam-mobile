@@ -5,13 +5,34 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
     "assetBundlePatterns": ["**/*"],
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#155124"
+    },
     "ios": { "supportsTablet": false },
     "android": {
-      "adaptiveIcon": { "backgroundColor": "#155124" },
+      "icon": "./assets/icon.png",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon_foreground.png",
+        "backgroundColor": "#155124"
+      },
+      "splash": {
+        "image": "./assets/splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#155124"
+      },
       "usesCleartextTraffic": true,
-      "permissions": ["android.permission.INTERNET", "android.permission.ACCESS_NETWORK_STATE"]
+      "permissions": ["android.permission.INTERNET", "android.permission.ACCESS_NETWORK_STATE"],
+      "package": "com.e500.monsammobile"
     },
-    "scheme": "monsam"
+    "scheme": "monsam",
+    "extra": {
+      "eas": {
+        "projectId": "83ca23a8-2ae6-45d5-b96e-2feb7591d964"
+      }
+    }
   }
 }
