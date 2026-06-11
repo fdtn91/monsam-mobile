@@ -168,12 +168,10 @@ export default function VentasScreen () {
     scannedRef.current = true
     const item = inventario.find(i => i.sku.toLowerCase() === data.toLowerCase())
     if (item) {
-      // Agregar silenciosamente sin notificación
       agregarItem(item)
-      // Permitir escanear el siguiente código tras un breve delay
-      setTimeout(() => { scannedRef.current = false }, 1500)
+      setShowScanner(false)   // cerrar escáner
+      setShowTicket(true)     // abrir ticket
     } else {
-      // Solo mostrar alerta cuando el código NO está en el inventario
       setShowScanner(false)
       Alert.alert(
         '❌ No encontrado',
