@@ -28,16 +28,7 @@
       "package": "com.e500.monsammobile"
     },
     "scheme": "monsam",
-    "plugins": [
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "usesCleartextTraffic": true
-          }
-        }
-      ]
-    ],
+    "plugins": ["./plugins/withCleartextTraffic"],
     "extra": {
       "eas": {
         "projectId": "83ca23a8-2ae6-45d5-b96e-2feb7591d964"
