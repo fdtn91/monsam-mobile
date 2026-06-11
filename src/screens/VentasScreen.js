@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import {
   View, Text, FlatList, TextInput, TouchableOpacity,
   StyleSheet, Alert, ActivityIndicator, KeyboardAvoidingView,
   Platform, ScrollView, Modal
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { CameraView, useCameraPermissions } from 'expo-camera'
 import { api } from '../services/api'
 
 const C = {
@@ -25,6 +26,9 @@ export default function VentasScreen () {
   const [cliente,      setCliente]      = useState('')
   const [enviando,     setEnviando]     = useState(false)
   const [showTicket,   setShowTicket]   = useState(false)
+  const [showScanner,  setShowScanner]  = useState(false)
+  const [permission,   requestPermission] = useCameraPermissions()
+  const scannedRef = useRef(false)
 
   const cargar = useCallback(async () => {
     try {
@@ -149,6 +153,31 @@ export default function VentasScreen () {
     }
   }
 
+  // ── Escáner de código de barras ──────────────────────────
+  const abrirScanner = async () => {
+    if (!permission?.granted) {
+      const { granted } = await requestPermission()
+      if (!granted) { Alert.alert('Permiso denegado', 'Se necesita acceso a la cámara.'); return }
+    }
+    scannedRef.current = false
+    setShowScanner(true)
+  }
+
+  const onBarcodeScan = ({ data }) => {
+    if (scannedRef.current) return
+    scannedRef.current = true
+    setShowScanner(false)
+    const item = inventario.find(i => i.sku.toLowerCase() === data.toLowerCase())
+    if (item) {
+      agregarItem(item)
+      Alert.alert('✅ Escaneado', `${item.sku}\n${item.modelo} · ${item.color}`, [{ text: 'OK' }])
+    } else {
+      Alert.alert('❌ No encontrado', `El código "${data}" no está en el inventario.`,
+        [{ text: 'Escanear otro', onPress: () => { scannedRef.current = false; setShowScanner(true) } },
+         { text: 'Cancelar' }])
+    }
+  }
+
   // ── Filtrar inventario ────────────────────────────────────
   const filtrado = inventario.filter(i =>
     i.pares > 0 && (
@@ -194,7 +223,31 @@ export default function VentasScreen () {
               <Text style={{ color: C.muted, fontSize: 18, paddingHorizontal: 8 }}>✕</Text>
             </TouchableOpacity>
           }
+          <TouchableOpacity onPress={abrirScanner} style={s.scanBtn}>
+            <Text style={{ fontSize: 20 }}>📷</Text>
+          </TouchableOpacity>
         </View>
+
+        {/* Modal escáner */}
+        <Modal visible={showScanner} animationType="slide" onRequestClose={() => setShowScanner(false)}>
+          <View style={{ flex: 1, backgroundColor: '#000' }}>
+            <CameraView
+              style={{ flex: 1 }}
+              facing="back"
+              barcodeScannerSettings={{ barcodeTypes: ['qr', 'code128', 'code39', 'ean13', 'ean8', 'upc_a', 'upc_e', 'pdf417', 'aztec', 'datamatrix'] }}
+              onBarcodeScanned={onBarcodeScan}
+            />
+            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+              <View style={{ width: 260, height: 120, borderWidth: 2, borderColor: '#fff', borderRadius: 8, backgroundColor: 'transparent' }} />
+              <Text style={{ color: '#fff', marginTop: 16, fontSize: 14, fontWeight: '600' }}>Apunta al código de barras del SKU</Text>
+            </View>
+            <TouchableOpacity
+              style={{ position: 'absolute', top: 50, right: 20, backgroundColor: 'rgba(0,0,0,.6)', borderRadius: 20, padding: 10 }}
+              onPress={() => setShowScanner(false)}>
+              <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>✕ Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
 
         {/* Lista de inventario */}
         <FlatList
@@ -388,6 +441,7 @@ const s = StyleSheet.create({
   retryBtn:     { marginTop: 20, backgroundColor: C.accent, paddingHorizontal: 24, paddingVertical: 10, borderRadius: 8 },
   searchBar:    { flexDirection: 'row', alignItems: 'center', backgroundColor: C.card, margin: 12, borderRadius: 10, borderWidth: 1, borderColor: C.border, paddingHorizontal: 12 },
   searchInput:  { flex: 1, height: 44, fontSize: 13, color: C.text },
+  scanBtn:      { padding: 8, marginLeft: 4 },
 
   invCard:      { backgroundColor: C.card, borderRadius: 8, borderWidth: 1, borderColor: C.border, padding: 12, marginBottom: 8, flexDirection: 'row', alignItems: 'center' },
   invCardActivo:{ borderColor: C.accent, backgroundColor: 'rgba(21,81,36,.04)' },

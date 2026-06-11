@@ -9,23 +9,22 @@
     "assetBundlePatterns": ["**/*"],
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "contain",
+      "resizeMode": "cover",
       "backgroundColor": "#155124"
     },
     "ios": { "supportsTablet": false },
     "android": {
-      "icon": "./assets/icon.png",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon_foreground.png",
         "backgroundColor": "#155124"
       },
       "splash": {
         "image": "./assets/splash.png",
-        "resizeMode": "contain",
+        "resizeMode": "cover",
         "backgroundColor": "#155124"
       },
       "usesCleartextTraffic": true,
-      "permissions": ["android.permission.INTERNET", "android.permission.ACCESS_NETWORK_STATE"],
+      "permissions": ["android.permission.INTERNET", "android.permission.ACCESS_NETWORK_STATE", "android.permission.CAMERA"],
       "package": "com.e500.monsammobile"
     },
     "scheme": "monsam",
