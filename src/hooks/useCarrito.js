@@ -3,16 +3,16 @@ import { useState, useCallback } from 'react'
 export function useCarrito () {
   const [items, setItems] = useState([])
 
-  const agregar = useCallback((modelo, color) => {
+  const agregar = useCallback((modelo, color, cantidad = 1) => {
     setItems(prev => {
       const key = `${modelo.codigo}-${color.id}`
       const idx = prev.findIndex(i => i.key === key)
       if (idx >= 0) {
         const next = [...prev]
-        next[idx] = { ...next[idx], pares: next[idx].pares + 1 }
+        next[idx] = { ...next[idx], pares: next[idx].pares + cantidad }
         return next
       }
-      return [...prev, { key, codigo: modelo.codigo, carpeta: modelo.carpeta, color: color.nombre, color_hex: color.hex, color_hex2: color.hex2 || null, color_hex3: color.hex3 || null, pares: 1 }]
+      return [...prev, { key, codigo: modelo.codigo, carpeta: modelo.carpeta, color: color.nombre, color_hex: color.hex, color_hex2: color.hex2 || null, color_hex3: color.hex3 || null, pares: cantidad }]
     })
   }, [])
 

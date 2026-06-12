@@ -19,7 +19,7 @@ export default function DetalleScreen ({ carrito }) {
 
   const handleAgregar = () => {
     if (!colorSel) return
-    for (let i = 0; i < pares; i++) carrito.agregar(modelo, colorSel)
+    carrito.agregar(modelo, colorSel, pares)  // pasa la cantidad de una sola vez
     setAgregado(true); setTimeout(() => setAgregado(false), 1500)
   }
 
